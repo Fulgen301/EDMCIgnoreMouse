@@ -10,6 +10,6 @@ include(FindPython3)
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
-Python3_add_library(edmcignoremouse MODULE main.c)
+Python3_add_library(edmcignoremouse MODULE src/main.c)
 target_compile_definitions(edmcignoremouse PRIVATE UNICODE NOMINMAX WIN32_LEAN_AND_MEAN PY_SSIZE_T_CLEAN)
 target_link_libraries(edmcignoremouse PUBLIC kernel32 user32 comctl32)
