@@ -1,0 +1,56 @@
+name: CMake
+
+on:
+  push:
+    branches: "*"
+    tags: "*"
+  
+  pull_request:
+    branches: "*"
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: "Windows: Setup VS Dev Environment"
+      uses: seanmiddleditch/gha-setup-vsdevenv@v3
+      with:
+        arch: x86
+
+    - name: Configure CMake
+      run: cmake -A Win32 -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build build --config ${{env.BUILD_TYPE}}
+      
+    - name: Package
+      run: |
+        mkdir EDMC-IgnoreMouse
+        cp build/${{env.BUILD_TYPE}}/edmcignoremouse.pyd EDMC-IgnoreMouse
+        cp src/load.py EDMC-IgnoreMouse
+    
+    - name: "Publish Main Artifact"
+      uses: actions/upload-artifact@v2
+      with:
+        name: EDMC-IgnoreMouse
+        path: EDMC-IgnoreMouse
+    
+    - name: "ZIP"
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: powershell -Command 'Compress-Archive -Path EDMC-IgnoreMouse -Destination EDMC-IgnoreMouse.zip'
+    
+    - name: "Release"
+      uses: softprops/action-gh-release@v1
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      with:
+        files: EDMC-IgnoreMouse.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
