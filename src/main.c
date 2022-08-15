@@ -62,7 +62,7 @@ static DWORD WINAPI ThreadProc(LPVOID parameter)
 {
 	HWND targetWindow = ((void **) parameter)[0];
 	wchar_t *windowName = ((void **) parameter)[1];
-	MessageBox(NULL, windowName, L"", 0);
+
 	for (;;)
 	{
 		HWND window = FindWindowW(NULL, windowName);
